@@ -10,6 +10,8 @@
 #   }
 #   loadWasm()
 # https://github.com/rustwasm/wasm-bindgen/blob/master/examples/without-a-bundler/index.html
+# Requires wasm-pack:
+#   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
 PROJECT := crypt
 SHELL := bash
@@ -31,11 +33,13 @@ clean:  ## Clean up.
 	cd $(PROJECT) && rm -rf pkg target Cargo.lock
 
 #### Debug build.
+#### rustup component add clippy
 PHONY: dbg
 dbg: .test-dbg  ## Debug build.
 
 $(PROJECT)/pkg/dbg/$(PROJECT).js: $(PROJECT)/Cargo.toml $(PROJECT_RS_FILES)
 	$(call hdr,"dbg")
+	cd $(PROJECT) && cargo clippy
 	wasm-pack --version
 	cd $(PROJECT) && time wasm-pack build --target web --debug -d pkg/dbg
 
@@ -46,11 +50,13 @@ $(PROJECT)/pkg/dbg/$(PROJECT).js: $(PROJECT)/Cargo.toml $(PROJECT_RS_FILES)
 	@touch $@
 
 #### Release build.
+#### rustup component add clippy
 PHONY: rel
 rel: .test-rel  ## Release build.
 
 $(PROJECT)/pkg/rel/$(PROJECT).js: $(PROJECT)/Cargo.toml $(PROJECT_RS_FILES)
 	$(call hdr,"rel")
+	cd $(PROJECT) && cargo clippy
 	wasm-pack --version
 	cd $(PROJECT) && time wasm-pack build --target web --release -d pkg/rel
 
@@ -59,7 +65,7 @@ $(PROJECT)/pkg/rel/$(PROJECT).js: $(PROJECT)/Cargo.toml $(PROJECT_RS_FILES)
 	cd $(PROJECT) && time wasm-pack test --node --release
 	@touch $@
 
-##### Common
+##### shared targets for sources.
 $(PROJECT)/Cargo.toml: src/Cargo.toml | $(PROJECT)
 	$(call hdr,"$@")
 	$(SED) -e 's/__PROJECT__/$(PROJECT)/g' $< >$@

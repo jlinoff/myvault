@@ -2,8 +2,8 @@
 pub const CHUNK_SIZE: usize = 72;
 
 /// The available algorithms.
-pub const ALGORITHMS: &'static[&'static str] = &["__PROJECT__-aes-256-gcm",
-						 "__PROJECT__-aes-256-gcm-siv"];
+pub const ALGORITHMS: &[& str] = &["crypt-aes-256-gcm",
+				   "crypt-aes-256-gcm-siv"];
 
 // PKCS7 padding for a 32 byte array.
 pub fn pkcs7_pad32(bytes: &[u8]) -> [u8; 32] {
@@ -14,9 +14,7 @@ pub fn pkcs7_pad32(bytes: &[u8]) -> [u8; 32] {
         n = 31;
     }
     let mut arr = [m as u8; 32];
-    for i in 0..n {
-        arr[i] = bytes[i];
-    }
+    arr[..n].clone_from_slice(&bytes[..n]);
     arr
 }
 
@@ -80,7 +78,7 @@ pub fn header_suffix(algorithm: String) -> String {
 /// True if it is valid or false otherwise.
 pub fn is_valid_algorithm(provisional: String) -> bool {
     for algorithm in ALGORITHMS {
-        if algorithm.to_string() == provisional {
+        if *algorithm == provisional {
             return true
         }
     }

@@ -16,7 +16,7 @@ use crate::shared::{CHUNK_SIZE, pkcs7_pad32, header_prefix, header_suffix};
 /// # Returns
 /// The encrypted, mime encoded ciphertext.
 pub fn encrypt(password: String, plaintext: String) -> String {
-    let algorithm = "__PROJECT__-aes-256-gcm-siv";
+    let algorithm = "crypt-aes-256-gcm-siv";
 
     // Define the key.
     let bytes = pkcs7_pad32(password.as_bytes()); // must be 32 bytes
@@ -66,10 +66,10 @@ pub fn encrypt(password: String, plaintext: String) -> String {
     let prefix = header_prefix(algorithm.to_string());
     let suffix = header_suffix(algorithm.to_string());
     let mut result = prefix;
-    result.push_str("\n");
+    result.push('\n');
     result.push_str(&body);
     result.push_str(&suffix);
-    result.push_str("\n");
+    result.push('\n');
     result
 }
 
@@ -85,7 +85,7 @@ pub fn encrypt(password: String, plaintext: String) -> String {
 /// # Returns
 /// The unencrypted plaintext to the caller.
 pub fn decrypt(password: String, ciphertext: String) -> String {
-    let algorithm = "__PROJECT__-aes-256-gcm-siv";
+    let algorithm = "crypt-aes-256-gcm-siv";
 
     // Define the key.
     let bytes = pkcs7_pad32(password.as_bytes()); // must be 32 bytes
@@ -105,7 +105,7 @@ pub fn decrypt(password: String, ciphertext: String) -> String {
     //    <base64>
     //    <SUFFIX>
     // If it is not in this format, it is rejected.
-    let split = ciphertext.split("\n");
+    let split = ciphertext.split('\n');
     let vec = split.collect::<Vec<&str>>();
     let prefix = vec[0].to_string();
     if prefix != header_prefix(algorithm.to_string()) {

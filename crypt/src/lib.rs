@@ -7,9 +7,9 @@
 //! ```js
 //! // Import the encrypt and decrypt functions.
 //! // Must be in a module.
-//! import { encrypt, decrypt, default as init } from './__PROJECT__.js';
+//! import { encrypt, decrypt, default as init } from './crypt.js';
 //! async function load_wasm() {
-//!     await init('./__PROJECT___bg.wasm');
+//!     await init('./crypt_bg.wasm');
 //!     window.encrypt = encrypt;
 //!     window.decrypt = decrypt;
 //! }
@@ -18,7 +18,7 @@
 //! # Example Javascript Encrypt Usage
 //! ```js
 //! function encrypt(password, plaintext) {
-//!    var result = window.encrypt("__PROJECT__-aes-256-gcm", pass, plaintext);
+//!    var result = window.encrypt("crypt-aes-256-gcm", pass, plaintext);
 //!    return result;
 //! }
 //! ```
@@ -26,7 +26,7 @@
 //! # Example Javascript Decrypt Usage
 //! ```js
 //! function decrypt(password, ciphertext) {
-//!    var result = window.decrypt("__PROJECT__-aes-256-gcm", pass, ciphertext);
+//!    var result = window.decrypt("crypt-aes-256-gcm", pass, ciphertext);
 //!    return result;
 //! }
 //! ```
@@ -43,7 +43,7 @@ mod aes_256_gcm_siv;
 /// Return the module name.
 #[wasm_bindgen]
 pub fn get_name() -> String {
-    return "__PROJECT__".to_string()
+    "crypt".to_string()
 }
 
 /// Return the number of algorithms available.
@@ -58,7 +58,7 @@ pub fn get_algorithm(i: usize) -> String {
     if i < ALGORITHMS.len() {
         return ALGORITHMS[i].to_string();
     }
-    format!("error:algorithms:invalid-index:{}", i).to_string()
+    format!("error:algorithms:invalid-index:{}", i)
 }
 
 /// Return the header prefix.
@@ -100,12 +100,12 @@ pub fn header_suffix(algorithm: String) -> String {
 #[wasm_bindgen]
 pub fn encrypt(algorithm: String, password: String, plaintext: String) -> String {
     if !shared::is_valid_algorithm(algorithm.to_string()) {
-        return format!("error:encrypt:invalid:{}", algorithm).to_string()
+        return format!("error:encrypt:invalid:{}", algorithm)
     }
-    if algorithm.to_string() == "__PROJECT__-aes-256-gcm" {
+    if algorithm == "crypt-aes-256-gcm" {
         return aes_256_gcm::encrypt(password, plaintext);
     }
-    if algorithm.to_string() == "__PROJECT__-aes-256-gcm-siv" {
+    if algorithm == "crypt-aes-256-gcm-siv" {
         return aes_256_gcm_siv::encrypt(password, plaintext);
     }
     format!("error:encrypt:not-implemented:{}", algorithm)
@@ -126,12 +126,12 @@ pub fn encrypt(algorithm: String, password: String, plaintext: String) -> String
 #[wasm_bindgen]
 pub fn decrypt(algorithm: String, password: String, ciphertext: String) -> String {
     if !shared::is_valid_algorithm(algorithm.to_string()) {
-        return format!("error:decrypt:invalid:{}", algorithm).to_string()
+        return format!("error:decrypt:invalid:{}", algorithm)
     }
-    if algorithm.to_string() == "__PROJECT__-aes-256-gcm" {
+    if algorithm == "crypt-aes-256-gcm" {
         return aes_256_gcm::decrypt(password, ciphertext);
     }
-    if algorithm.to_string() == "__PROJECT__-aes-256-gcm-siv" {
+    if algorithm == "crypt-aes-256-gcm-siv" {
         return aes_256_gcm_siv::decrypt(password, ciphertext);
     }
     format!("error:decrypt:not-implemented:{}", algorithm)
@@ -191,7 +191,7 @@ mod tests {
     pub fn test03() {
         // Verify that the aes-256-gcm encryption works.
         println!("test03: start");
-        let algorithm = "__PROJECT__-aes-256-gcm";
+        let algorithm = "crypt-aes-256-gcm";
         println!("test03: algorithm: {}", algorithm.to_string());
 
         let prefix = header_prefix(algorithm.to_string());
@@ -212,7 +212,7 @@ mod tests {
     pub fn test04() {
         // Verify that the aes-256-gcm-siv encryption works.
         println!("test04: start");
-        let algorithm = "__PROJECT__-aes-256-gcm-siv";
+        let algorithm = "crypt-aes-256-gcm-siv";
         println!("test04: algorithm: {}", algorithm.to_string());
 
         let prefix = header_prefix(algorithm.to_string());
