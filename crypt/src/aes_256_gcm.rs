@@ -1,8 +1,8 @@
+use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead};
 /// Implementation of the AES-256-GCM encrypt/decrypt algorithms.
 use aes_gcm::Aes256Gcm; // Or `Aes128Gcm`
-use aes_gcm::aead::{Aead, NewAead, generic_array::GenericArray};
 
-use crate::shared::{CHUNK_SIZE, pkcs7_pad32, header_prefix, header_suffix};
+use crate::shared::{header_prefix, header_suffix, pkcs7_pad32, CHUNK_SIZE};
 
 /// Encrypts a string coming from Javascript using the AES-256-GCM algorithm.
 ///
@@ -38,7 +38,7 @@ pub fn encrypt(password: String, plaintext: String) -> String {
         Ok(v) => ciphertext = v,
         Err(e) => {
             let err = format!("error:encrypt: invalid encrypt \"{}\"", e);
-            return err
+            return err;
         }
     }
 
@@ -54,7 +54,7 @@ pub fn encrypt(password: String, plaintext: String) -> String {
     while pos < ctb64.len() {
         let mut len = 0;
         for ch in itr.by_ref().take(CHUNK_SIZE) {
-            len += ch.len_utf8();  // for multi-byte strings.
+            len += ch.len_utf8(); // for multi-byte strings.
         }
         subs.push(&ctb64[pos..pos + len]);
         subs.push("\n");
@@ -110,7 +110,7 @@ pub fn decrypt(password: String, ciphertext: String) -> String {
     let prefix = vec[0].to_string();
     if prefix != header_prefix(algorithm.to_string()) {
         let err = format!("error:decrypt: invalid prefix \"{}\"", prefix);
-        return err
+        return err;
     }
 
     // Try to be a little resilient by allowing a new line at the end.
@@ -122,7 +122,7 @@ pub fn decrypt(password: String, ciphertext: String) -> String {
         suffix = vec[max].to_string();
         if suffix != good_suffix {
             let err = format!("error:decrypt: invalid suffix \"{}\"", suffix);
-            return err
+            return err;
         }
     }
 
@@ -130,14 +130,14 @@ pub fn decrypt(password: String, ciphertext: String) -> String {
     let subs = &vec[1..max];
     let mut ctb64 = String::from("");
     for sub in subs {
-       ctb64.push_str(sub);
+        ctb64.push_str(sub);
     }
     let bytes;
     match base64::decode(ctb64.as_bytes()) {
         Ok(v) => bytes = v,
         Err(e) => {
             let err = format!("error:decrypt: invalid base64 conversion \"{}\"", e);
-            return err
+            return err;
         }
     }
 
@@ -147,7 +147,7 @@ pub fn decrypt(password: String, ciphertext: String) -> String {
         Ok(v) => plaintext = v,
         Err(e) => {
             let err = format!("error:decrypt: invalid decrypt \"{}\"", e);
-            return err
+            return err;
         }
     }
     //let plaintext = cipher.decrypt(nonce, bytes.as_ref())

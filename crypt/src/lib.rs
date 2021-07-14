@@ -100,7 +100,7 @@ pub fn header_suffix(algorithm: String) -> String {
 #[wasm_bindgen]
 pub fn encrypt(algorithm: String, password: String, plaintext: String) -> String {
     if !shared::is_valid_algorithm(algorithm.to_string()) {
-        return format!("error:encrypt:invalid:{}", algorithm)
+        return format!("error:encrypt:invalid:{}", algorithm);
     }
     if algorithm == "crypt-aes-256-gcm" {
         return aes_256_gcm::encrypt(password, plaintext);
@@ -126,7 +126,7 @@ pub fn encrypt(algorithm: String, password: String, plaintext: String) -> String
 #[wasm_bindgen]
 pub fn decrypt(algorithm: String, password: String, ciphertext: String) -> String {
     if !shared::is_valid_algorithm(algorithm.to_string()) {
-        return format!("error:decrypt:invalid:{}", algorithm)
+        return format!("error:decrypt:invalid:{}", algorithm);
     }
     if algorithm == "crypt-aes-256-gcm" {
         return aes_256_gcm::decrypt(password, ciphertext);
@@ -141,11 +141,11 @@ pub fn decrypt(algorithm: String, password: String, ciphertext: String) -> Strin
 mod tests {
     use wasm_bindgen_test::*;
     extern crate wasm_bindgen;
-    use crate::header_prefix;
-    use crate::get_num_algorithms;
-    use crate::get_algorithm;
-    use crate::encrypt;
     use crate::decrypt;
+    use crate::encrypt;
+    use crate::get_algorithm;
+    use crate::get_num_algorithms;
+    use crate::header_prefix;
 
     #[wasm_bindgen_test]
     pub fn test01() {
@@ -161,7 +161,11 @@ mod tests {
         let password = "secret";
         let plaintext = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         println!("test01: encrypting");
-        let ciphertext = encrypt(algorithm.to_string(), password.to_string(), plaintext.to_string());
+        let ciphertext = encrypt(
+            algorithm.to_string(),
+            password.to_string(),
+            plaintext.to_string(),
+        );
         println!("test01: ciphertext={}", ciphertext.to_string());
         assert!(ciphertext.starts_with("error:encrypt:invalid:"));
         println!("test01: done");
@@ -180,7 +184,7 @@ mod tests {
         println!("test02: al0={}", al0);
         assert!(!al0.starts_with("error:"));
 
-        let aln = get_algorithm(num+1);
+        let aln = get_algorithm(num + 1);
         println!("test02: aln={}", aln);
         assert!(aln.starts_with("error:"));
 
@@ -200,9 +204,17 @@ mod tests {
         let password = "secret";
         let plaintext = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         println!("test03: encrypting");
-        let ciphertext = encrypt(algorithm.to_string(), password.to_string(), plaintext.to_string());
+        let ciphertext = encrypt(
+            algorithm.to_string(),
+            password.to_string(),
+            plaintext.to_string(),
+        );
         println!("test03: decrypting");
-        let testtext = decrypt(algorithm.to_string(), password.to_string(), ciphertext.to_string());
+        let testtext = decrypt(
+            algorithm.to_string(),
+            password.to_string(),
+            ciphertext.to_string(),
+        );
         println!("test03: '{}' ==? {}", &plaintext, &testtext);
         assert_eq!(&plaintext, &testtext);
         println!("test03: done");
@@ -221,9 +233,17 @@ mod tests {
         let password = "secret";
         let plaintext = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         println!("test04: encrypting");
-        let ciphertext = encrypt(algorithm.to_string(), password.to_string(), plaintext.to_string());
+        let ciphertext = encrypt(
+            algorithm.to_string(),
+            password.to_string(),
+            plaintext.to_string(),
+        );
         println!("test04: decrypting");
-        let testtext = decrypt(algorithm.to_string(), password.to_string(), ciphertext.to_string());
+        let testtext = decrypt(
+            algorithm.to_string(),
+            password.to_string(),
+            ciphertext.to_string(),
+        );
         println!("test04: '{}' ==? {}", &plaintext, &testtext);
         assert_eq!(&plaintext, &testtext);
         println!("test04: done");

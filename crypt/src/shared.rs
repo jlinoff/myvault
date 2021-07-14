@@ -2,8 +2,7 @@
 pub const CHUNK_SIZE: usize = 72;
 
 /// The available algorithms.
-pub const ALGORITHMS: &[& str] = &["crypt-aes-256-gcm",
-				   "crypt-aes-256-gcm-siv"];
+pub const ALGORITHMS: &[&str] = &["crypt-aes-256-gcm", "crypt-aes-256-gcm-siv"];
 
 // PKCS7 padding for a 32 byte array.
 pub fn pkcs7_pad32(bytes: &[u8]) -> [u8; 32] {
@@ -38,8 +37,8 @@ pub fn header_subject(algorithm: String, kind: String) -> String {
     if (len % 2) == 1 {
         lw += 1;
     }
-    let lws = format!("{:-<width$}", "", width=lw);
-    let rws = format!("{:->width$}", "", width=rw);
+    let lws = format!("{:-<width$}", "", width = lw);
+    let rws = format!("{:->width$}", "", width = rw);
     let header = format!("{} {} {}", lws, title, rws);
     header
 }
@@ -79,7 +78,7 @@ pub fn header_suffix(algorithm: String) -> String {
 pub fn is_valid_algorithm(provisional: String) -> bool {
     for algorithm in ALGORITHMS {
         if *algorithm == provisional {
-            return true
+            return true;
         }
     }
     false
