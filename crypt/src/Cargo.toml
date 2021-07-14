@@ -1,0 +1,22 @@
+[package]
+name = "__PROJECT__"
+version = "0.1.0"
+authors = ["jlinoff <jlinoff@acme.com>"]
+edition = "2018"
+description = "Symmetric encryption for javascript."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+aes-gcm = "0.8.0"
+aes-gcm-siv = "0.9.0"
+base64 = "0.13.0"
+chacha20poly1305 = "0.7.1"
+num-format = "0.4.0"
+#rand = "0.8.3" <-- this version caused compile errors
+rand = "0.7"
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3.0"
+
+[lib]
+crate-type =["cdylib"]

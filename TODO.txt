@@ -1,0 +1,9 @@
+1. DONE pylint/mypy test_ui.py
+   DONE pipenv run pylint tests/test_ui.py
+2. DONE add record add/edit/delete tests.
+3. DONE headless server browser testing.
+4. DONE another pass through the help.
+5. DONE add a how to get started to the README.
+6. tell user how to run locally (README and HELP).
+7. add to github
+

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- https://codepen.io/sosuke/pen/Pjoqqp -->
+  <!-- convert color string to RGB -->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>color2rgb</title>
+  <meta name="author" content="Joe Linoff">
+  <body>
+    <h3 id='title'></h3>
+    <input type='text' id='x-exp-value' width='30' placeholder='color'></input>
+    <button onclick='exp1()'>convert</button>
+    <p id='exp1Result'></p>
+    <div id='exp1Color' style='width: 32px; height: 32px'>
+      &nbsp;
+    </div>
+    <script>
+      function convertColorStringToRGBSpec(color) {
+          const html = document.querySelector('html')
+          const originalColor = html.style.color
+          html.style.color = color
+          const rgb = window.getComputedStyle(html).color
+          html.style.color = originalColor
+          return rgb
+      }
+       function convertColorStringtoHex(color) {
+          const rgb = convertColorStringToRGBSpec(color)
+          const regex = /(\d+)/g
+          const result = rgb.match(regex)
+          let hexColor = '#'
+          result.forEach( (v) => {
+              let h = Number(v).toString(16)
+              if (h.length == 1) {
+                  h = '0' + h
+              }
+              hexColor += h
+          })
+          return hexColor
+       }
+      function convertColorToRGB(color) {
+          const hv = convertColorStringtoHex(color)
+          const a = hv.substring(1).match(/.{1,2}/g)
+          return a
+      }
+      function exp1() {
+          const color = document.getElementById('x-exp-value').value
+          const rgb = convertColorStringToRGBSpec(color)
+          const hv = convertColorStringtoHex(color)
+          //const a = hv.substring(1).match(/.{1,2}/g)
+          const a =  convertColorToRGB(color)
+          document.getElementById('exp1Result').innerHTML = `result: <code>${color}" -> ${rgb}, ${hv}, a=${a.length}[${a}]}</code>`
+          document.getElementById('exp1Color').style.backgroundColor = hv
+      }
+    </script>
+    <script>
+      window.onload = () => {
+          document.getElementById('title').innerHTML = 'Convert Color String to RGB'
+      }
+    </script>
+  </body>
+</html>

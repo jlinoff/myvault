@@ -1,0 +1,14 @@
+*~
+crypt/crypt/
+crypt/.test-dbg
+crypt/.test-rel
+# ignore generated files
+www/js/crypt.js
+www/js/crypt_bg.wasm
+www/js/version.js
+www/README.pdf
+*.tar
+www/help/
+www/xtra/doc/
+Pipfile.lock
+keep/

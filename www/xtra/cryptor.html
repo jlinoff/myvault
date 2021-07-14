@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Cryptor</title>
+    <meta name="author" content="Joe Linoff">
+    <style>
+      * {
+          font-family: Arial, Helvetica, Tahoma, Calibri, Verdana, sans-serif;
+          color: #f2f4f4;
+          background-color: #1a355b;
+          font-size: 14px;
+      }
+      #x-algorithms-div {
+          text-align: left;
+      }
+      #x-text {
+          font-family: monospace;
+          width: 95%;
+          resize: both;
+          overflow: auto;
+          rows: 10; /* this did not work */
+          height: 20ch;
+      }
+      button: {
+          width: 20ch;
+          text-align: center;
+      }
+      #x-filename {
+          min-width: 40ch;
+      }
+      #x-password {
+          min-width: 40ch;
+      }
+      .x-center {
+          margin-left: auto;
+          margin-right: auto;
+      }
+    </style>
+    <body>
+      <center>
+        <h3 id='x-title'></h3>
+        <center>
+          <div id='x-input' class='x-center'>
+            <div style='text-align: left; width: 50%'>
+              <p>
+                Encrypt and decrypt text data.
+                If the data is JSON it can be formatted or compressed.
+                The data can be entered manually, pasted from the clipboard or loaded from a file.
+                It can be saved to a file or copied to the clipboard.
+              </p>
+            </div>
+          </div>
+        </center>
+        <div style='width: 32ch'>
+          <fieldset>
+            <legend>Crypt Algorithms</legend>
+          <div id='x-algorithms-div'>
+          </fieldset>
+          </div>
+        </div>
+        <center>
+          <br>
+          <div id='x-text-div'>
+            <textarea id='x-text' placeholder='text data'></textarea>
+            <div id='x-text-size'></div>
+          </div>
+        </center>
+        <center>
+          <div id='x-input' class='x-center'>
+            <br>
+            <label>filename:</label>
+            <input id='x-filename' type='text' name='filename' value='' placeholder='file name'/>
+            &nbsp;
+            <button id='x-filename-clear' type='text'>x</button>
+            <br>
+            <br>
+            <label>password:</label>
+            <input id='x-password' type='password' name='password' value='' placeholder='password'/>
+            &nbsp;
+            <button id='x-password-clear' type='text'>x</button>
+            &nbsp;
+            <span id='x-password-size'></span>
+            </div>
+        </center>
+        <center>
+          <br>
+          <div id='x-buttons'>
+          </div>
+        </center>
+        <center>
+          <br>
+          <div id='x-status'>
+          </div>
+        </center>
+      <script type='module' charset='utf-8'>
+        import { enableFunctionChaining, xmake } from '/js/utils.js'
+        import { words } from '/js/en_words.js'
+        import init, {
+            decrypt,
+            encrypt,
+            get_algorithm,
+            get_name,
+            get_num_algorithms,
+            header_prefix,
+            header_suffix,
+        } from '/js/crypt.js';
+        enableFunctionChaining()
+        var crypt = {}
+        var cryptReady = false
+        var algorithm = ''
+        var filename = ''
+        var password = ''
+
+        async function loadCrypt() {
+            await init()
+            let fcts = {
+                decrypt: decrypt, // decrypt(algorithm: string, password: string, plaintext: string) -> string
+                encrypt: encrypt, // encrypt(algorithm: string, password: string, plaintext: string) -> string
+                get_algorithm: get_algorithm, // get_algorithm(int) -> string
+                get_name: get_name, // get_name() -> string (module name)
+                get_num_algorithms: get_num_algorithms, // get_num_algorithms() -> int
+                header_prefix: header_prefix, // header_prefix(algorithm: string) -> string
+                header_suffix: header_suffix, // header_suffix(algorithm: string) -> string
+            }
+            crypt = fcts
+            console.log('crypt.get_num_algorithms = ', crypt.get_num_algorithms())
+            main()
+        }
+        loadCrypt()
+
+        function main() {
+            console.log('document.readyState = ', document.readyState)
+            console.log('crypt', crypt)
+            console.log('crypt.get_num_algorithms = ', crypt.get_num_algorithms())
+            document.getElementById('x-title').innerHTML = document.title
+            loadAlgorithms()
+            makeButtons()
+            document.getElementById('x-text')
+                .xAddEventListener('input', e => updateTextSize(e))
+                .xAddEventListener('paste', e => updateTextSize(e))
+                .xAddEventListener('click', e => updateTextSize(e))
+                .xAddEventListener('change', e => updateTextSize(e))
+            document.getElementById('x-password')
+                .xAddEventListener('input', e => updatePasswordSize(e))
+                .xAddEventListener('paste', e => updatePasswordSize(e))
+                .xAddEventListener('click', e => updatePasswordSize(e))
+                .xAddEventListener('change', e => updatePasswordSize(e))
+            document.getElementById('x-filename-clear')
+                .xAddEventListener('click', () => {document.getElementById('x-filename').value = ''})
+            document.getElementById('x-password-clear')
+                .xAddEventListener('click', () => {document.getElementById('x-password').value = ''})
+        }
+
+        function updateTextSize(e) {
+            let value = document.getElementById('x-text').value
+            document.getElementById('x-text-size').innerHTML = value.length
+        }
+
+        function updatePasswordSize() {
+            let value = document.getElementById('x-password').value
+            document.getElementById('x-password-size').innerHTML = value.length
+        }
+
+        function status(msg) {
+            document.getElementById('x-status').innerHTML = msg
+            setTimeout( () => {document.getElementById('x-status').innerHTML = ""}, 1500)
+        }
+
+        function loadAlgorithms() {
+            algorithm = crypt.get_algorithm(0)
+            let div = document.getElementById('x-algorithms-div')
+            let num = crypt.get_num_algorithms()
+            for(let i=0; i <num; i++) {
+                let aname = crypt.get_algorithm(i)
+                div.xAppendChild(
+                    xmake('input')
+                        .xAttr('type', 'radio')
+                        .xAttr('name', 'algorithm')
+                        .xAttrIfTrue('checked', 'checked', algorithm === aname)
+                        .xAttr('value', aname)
+                        .xAddEventListener('change', (e) => { algorithm = e.target.value } ), // jshint ignore:line
+                    xmake('label')
+                        .xAttr('for', aname)
+                        .xInnerHTML(aname),
+                    xmake('br'))
+            }
+        }
+        function makeButtons() {
+            let div = document.getElementById('x-buttons')
+            div.xAppendChild(
+                xmake('button')
+                    .xInnerHTML('Load File')
+                    .xTooltip('select and load file')
+                    .xAddEventListener('click',
+                                       () => {
+                                           loadFile()
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Save File')
+                    .xTooltip('save to file')
+                    .xAddEventListener('click',
+                                       () => {
+                                           saveFile()
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Clear Text')
+                    .xAddEventListener('click',
+                                       () => {
+                                           document.getElementById('x-text').value = ''
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Show Password')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let e = document.getElementById('x-password')
+                                           let b = event.currentTarget
+                                           password = e.value
+                                           if (e.type == 'password') {
+                                               e.type = 'text'
+                                               b.innerHTML = 'Hide Password'
+                                           } else {
+                                               e.type = 'password'
+                                               b.innerHTML = 'Show Password'
+                                           }
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Cryptic Password')
+                    .xTooltip('generate a cryptic password')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let e = document.getElementById('x-password')
+                                           let p = cryptic()
+                                           e.value = p
+                                           updatePasswordSize()
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Memorable Password')
+                    .xTooltip('generate a memorable password')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let e = document.getElementById('x-password')
+                                           let p = memorable()
+                                           e.value = p
+                                           updatePasswordSize()
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Encrypt')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let password = document.getElementById('x-password').value
+                                           let text = document.getElementById('x-text').value
+                                           let result = crypt.encrypt(algorithm, password, text)
+                                           document.getElementById('x-text').value = result
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Decrypt')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let password = document.getElementById('x-password').value
+                                           let text = document.getElementById('x-text').value
+                                           let result = crypt.decrypt(algorithm, password, text)
+                                           document.getElementById('x-text').value = result
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Format JSON')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let text = document.getElementById('x-text').value
+                                           let data = {}
+                                           try {
+                                               data = JSON.parse(text)
+                                           } catch (exc) {
+                                               alert(`JSON Format operation failed:\m ${exc}`)
+                                               return
+                                           }
+                                           let result = JSON.stringify(data, null, 4)
+                                           // TODO error handling
+                                           document.getElementById('x-text').value = result
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Compress JSON')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let text = document.getElementById('x-text').value
+                                           let data = {}
+                                           try {
+                                               data = JSON.parse(text)
+                                           } catch (exc) {
+                                               alert(`JSON Format operation failed:\m ${exc}`)
+                                               return
+                                           }
+                                           let result = JSON.stringify(data)
+                                           // TODO error handling
+                                           document.getElementById('x-text').value = result
+                                       }),
+                xmake('button')
+                    .xInnerHTML('Copy')
+                    .xTooltip('copy to clipboard')
+                    .xAddEventListener('click',
+                                       (event) => {
+                                           let value = document.getElementById('x-text').value
+                                           navigator.clipboard.writeText(value).then((value) => {}, () => {
+                                               alert('clipboard copy operation failed')})
+                                           status(`copied ${value.length} bytes to the clipboard`)
+                                       }),
+                xmake('span').xId('x-length'),
+            )
+        }
+
+
+        function loadFile() {
+            let xid = 'x-load-file-selector'
+            let input = xmake('input')
+                .xId(xid)
+                .xStyle({visibility: 'hidden'})
+                .xAttr('value', filename)
+                .xAttr('type', 'file')
+                .xAttr('accept', '.txt,.text,.js')
+                .xAddEventListener('change', (event)=> {
+                    const fileList = event.target.files
+                    if (fileList.length === 1) {
+                        var file = fileList[0]
+                        const reader = new FileReader()
+                        reader.addEventListener('load', (e) => {
+                            const text = e.target.result
+                            let t = file.type ? file.type : "unknown"
+                            filename = file.name
+                            let msg = `Loaded ${ text.length } bytes from: "${file.name}" (type: <code>${t}</code>).`
+                            document.getElementById('x-text').value = text
+                            document.getElementById('x-filename').value = filename.trim()
+                            document.getElementById('x-text-size').innerHTML = text.length
+                            status(msg)
+                        })
+                        reader.readAsText(file)
+                        let e = document.getElementById(xid)
+                        if (e) {
+                            e.remove() // clean up
+                        }
+                    }
+                })
+                .xAddEventListener('click', (event)=> {
+                    setTimeout( () => {
+                        if (event.target && event.target.files.length === 0) {
+                            status('No file was selected.')
+                        }
+                    }, 2000)
+                })
+            input.click()
+        }
+
+        function saveFile() {
+            let filename = document.getElementById('x-filename').value.trim()
+            let text = document.getElementById('x-text').value.trim()
+            if( filename.length === 0 ) {
+                alert('need to specify a file name')
+                return
+            }
+            if( text.length === 0 ) {
+                alert('no text to save')
+                return
+            }
+            let e  = xmake('a')
+                .xAttr('href','data:text/plain; charset=utf-8,' + encodeURIComponent(text.trim()))
+                .xAttr('download', filename)
+                .xStyle({display: 'none'})
+            document.body.appendChild(e)
+            e.click()
+            e.remove()
+            status(`saved ${text.length} bytes to ${filename}`)
+        }
+
+        function cryptic(opts) {
+            function getval(prop, defval) {
+                if (!opts) {
+                    return defval
+                }
+                if (opts.hasOwnProperly(prop)) {
+                    return opts.minlen
+                }
+                return defval
+            }
+            let alphabet = getval('alphabet', "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-!.");
+            let size = alphabet.length;
+            let result = '';
+            let minlen = getval('minval', 15)
+            let maxlen = getval('maxval', 31)
+
+            // Add a touch more randomness.
+            var num_rounds = Math.floor(Math.random() * (100))
+            for (let j=0; j < num_rounds; j++) {
+                var length = Math.floor(Math.random() * (maxlen - minlen)) + minlen
+                let array;
+                if ('Uint8Array' in self && 'crypto' in self) {
+                    array = new Uint8Array(length);
+                    self.crypto.getRandomValues(array);
+                } else {
+                    array = new Array(length);
+                    for (let i = 0; i < length; i++) {
+                        array[i] = Math.floor(Math.random() * 62)
+                    }
+                }
+                result = '';  // reset each round
+                for (let i=0; i < length; i++) {
+                    result += alphabet.charAt(array[i] % size)
+                }
+            }
+            return result
+        }
+
+        // Generate a word.
+        function randomWord(minlen, maxlen) {
+            var i = Math.floor(Math.random() * words.length);
+            var word = words[i];
+            while (word.length < minlen || word.length > maxlen) {
+                i = Math.floor(Math.random() * words.length);
+                word = words[i];
+            }
+            return word;
+        }
+
+        // Generate a human readable (memorable) password.
+        function memorable() {
+            const tminlen = 15;
+            const tmaxlen = 31;
+            const wminlen = 3;
+            const wmaxlen = 15;
+            const sep = '/';
+            var result = '';
+            while (result.length < tminlen || result.length > tmaxlen) {
+                result = '';
+                for(var i=0; i<3; i++) {
+                    var word = randomWord(wminlen, wmaxlen);
+                    if (i) {
+                        result += sep;
+                    }
+                    result += word;
+                }
+            }
+            return result;
+        }
+      </script>
+    </body>
+</html>
