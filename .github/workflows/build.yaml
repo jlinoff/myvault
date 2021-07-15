@@ -1,0 +1,90 @@
+# Build and test myvault using python, pytest, rust, wasm-pack,
+# clippy, jshint, jddocs, headless chrome browser and other stuff.
+#
+# It was tested locally using act: https://github.com/nektos/act
+name: build-and-test
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Allow more than 1 one os in the future.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: sudo apt-get update
+
+      - run: sudo apt-get install -y zip unzip curl wget gdebi-core git-all curl wget gdebi-core git
+
+      - name: 'Setup Python 3.9'
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python
+          # version.
+          python-version: '3.9'
+
+      - run: pip install pipenv
+
+      - run: pipenv install --deploy
+
+      - run: sudo apt install -y libappindicator1 fonts-liberation
+
+      - run: sudo apt install -y chromium-chromedriver
+
+      - name: 'Install chromedriver'
+        run: |
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo gdebi -n google-chrome-stable_current_amd64.deb
+
+      # Note: originally failed with google-chrome not found.
+      - uses: nanasess/setup-chromedriver@master
+
+      - run: google-chrome --version
+
+      - name: 'Install rust'
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+
+      - name: 'Install wasm-pack'
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash -s -- --mode no-prompt
+
+      - name: 'Install node'
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - run: npm install
+
+      - run: npm install -g jshint
+
+      - run: npm install -g jsdoc
+
+      - run: sudo apt install -y pandoc
+
+      - run:  make build
+
+      - run: make test
+
+      # make the webapp.tar artifact: webapp.tar.
+      - run: make webapp
+
+      - name: 'upload webapp'
+        uses: actions/upload-artifact@v2
+        with:
+          name: webapp
+          path: webapp.tar
+          # Maximum is 90 days for public repos          retention-days: 30
