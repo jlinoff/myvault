@@ -23,9 +23,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: sudo apt-get update
+      - run: sudo apt update
 
-      - run: sudo apt-get install -y zip unzip curl wget gdebi-core git-all curl wget gdebi-core git
+      - run: sudo apt install -y zip unzip curl wget gdebi-core git-all curl wget gdebi-core
 
       - name: 'Setup Python 3.9'
         uses: actions/setup-python@v2
