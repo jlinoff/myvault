@@ -8,7 +8,7 @@ www/js/crypt_bg.wasm
 www/js/version.js
 www/README.pdf
 *.tar
-www/help/
+www/help/index.html
 www/xtra/doc/
 Pipfile.lock
 keep/
