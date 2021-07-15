@@ -164,7 +164,7 @@ endif
 .PHONY: test
 test: Pipfile.lock ## run the local unit tests in headless mode
 	$(call hdr,"$@")
-	PORT=8007 pipenv run python -m pytest tests/test_ui.py --options="headless, incognito"
+	PORT=8007 pipenv run python -m pytest tests/test_ui.py --options="headless, incognito, no-sandbox, --disable-gpu"
 
 .PHONY: testi ti
 ti \
