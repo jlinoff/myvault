@@ -11,8 +11,8 @@ import { common } from '/js/common.js'
  * Internal utility function to generate a cryptic password composed
  * of letters, digits and special characters.
  * @example
- * password1 = _generateCrypticPassword()
- * password2 = _generateCrypticPassword({minlen: 64, maxlen: 64})
+ * password1 = generateCrypticPassword()
+ * password2 = generateCrypticPassword({minlen: 64, maxlen: 64})
  * asssert password2.length == 62
  * asssert password2.length > password1.length
  * @param {object} opts The password options object.
@@ -21,7 +21,7 @@ import { common } from '/js/common.js'
  * and the maximum length is 31.
  * @returns {string} The generated password.
  */
-function _generateCrypticPassword(opts) {
+export function generateCrypticPassword(opts) {
     function getval(prop, defval) {
         if (!opts) {
             return defval
@@ -88,12 +88,12 @@ function getRandomWord(minlen, maxlen) {
 * might make sense to make those parameters dynamic by adding them
 * to the common parameters.
 * @example
-* let password = _generateMemorablePassword()
+* let password = generateMemorablePassword()
 * assert password.count('/') == 2
 * assert password.length >= 15
 * @returns {string} The memorable password.
 */
-function _generateMemorablePassword() {
+export function generateMemorablePassword() {
     const tminlen = 15; // minimum password length
     const tmaxlen = 31; // maximum password length
     const wminlen = 3; // minimum word length
@@ -174,7 +174,7 @@ export function makePasswordEntry(placeholder, getter, setter) {
                     marginLeft: '10px',
                 })
                 .xAddClass('x-theme-element')
-                .xAddEventListener('click', e => generateCrypticPassword(e))
+                .xAddEventListener('click', e => generateCrypticPasswordHandler(e))
                 .xTooltip('generate pseudo-random cyptic password')
                 .xAppendChild(makeIcon(common.icons.cog, 'generate').xAddClass('x-show-hide-img')),
             xmake('button')
@@ -184,7 +184,7 @@ export function makePasswordEntry(placeholder, getter, setter) {
                     marginLeft: '10px',
                 })
                 .xAddClass('x-theme-element')
-                .xAddEventListener('click', e => generateMemorablePassword(e))
+                .xAddEventListener('click', e => generateMemorablePasswordHandler(e))
                 .xTooltip('generate pseudo-random memorable password')
                 .xAppendChild(makeIcon(common.icons.cogs, 'generate2').xAddClass('x-show-hide-img')),
             xmake('button')
@@ -268,7 +268,7 @@ export function makePasswordEntryWithId(eid, cls, placeholder,  value) {
                     color: common.themes._activeColors().fgColor,
                     marginLeft: '10px'})
                 .xAddClass('x-theme-element')
-                .xAddEventListener('click', e => generateCrypticPassword(e))
+                .xAddEventListener('click', e => generateCrypticPasswordHandler(e))
                 .xTooltip('generate pseudo-random cyptic password')
                 .xAppendChild(makeIcon(common.icons.cog, 'generate').xAddClass('x-show-hide-img')),
             xmake('button')
@@ -277,7 +277,7 @@ export function makePasswordEntryWithId(eid, cls, placeholder,  value) {
                     color: common.themes._activeColors().fgColor,
                     marginLeft: '10px'})
                 .xAddClass('x-theme-element')
-                .xAddEventListener('click', e => generateMemorablePassword(e))
+                .xAddEventListener('click', e => generateMemorablePasswordHandler(e))
                 .xTooltip('generate pseudo-random memorable password')
                 .xAppendChild(makeIcon(common.icons.cogs, 'generate2').xAddClass('x-show-hide-img')),
             xmake('button')
@@ -329,11 +329,11 @@ function showHidePassword(event) {
  * on a password cryptic button click event.
  * @param {event} event A DOM event.
  */
-function generateCrypticPassword(event) {
+function generateCrypticPasswordHandler(event) {
     let button = event.currentTarget
     let div = button.parentNode
     let input = div.parentNode.getElementsByClassName('x-password-input')[0]
-    input.value = _generateCrypticPassword()
+    input.value = generateCrypticPassword()
     let size = div.parentNode.getElementsByClassName('x-password-length')[0]
     size.innerHTML = input.value.length
     updatePasswordLength(event)
@@ -345,11 +345,11 @@ function generateCrypticPassword(event) {
  * on a password memorable button click event.
  * @param {event} event A DOM event.
  */
-function generateMemorablePassword(event) {
+function generateMemorablePasswordHandler(event) {
     let button = event.currentTarget
     let div = button.parentNode
     let input = div.parentNode.getElementsByClassName('x-password-input')[0]
-    input.value = _generateMemorablePassword()
+    input.value = generateMemorablePassword()
     let size = div.parentNode.getElementsByClassName('x-password-length')[0]
     size.innerHTML = input.value.length
     updatePasswordLength(event)

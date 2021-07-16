@@ -54,6 +54,7 @@ lint-js:  ## lint javascript source code using jshint
 	$(call hdr,"$@")
 	jshint --version
 	jshint --config jshint.json $$(ls -1 www/js/*js | grep -v crypt.js)
+	jshint --config jshint.json www/xtra/cryptor.js
 
 # help
 .PHONY: src-docs
