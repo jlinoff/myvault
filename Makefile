@@ -138,12 +138,12 @@ webapp:   ## create the web release tar file for upload to a site (myvault/).
 	$(SED) -i 's@/js/@/myvault/js/@g' www/index.html $$(ls -1 www/js/*js) www/xtra/cryptor.html www/xtra/cryptor.js
 	$(SED) -i 's@/icons/@/myvault/icons/@g' www/index.html $$(ls -1 www/js/*js)
 	$(SED) -i 's@/help/@/myvault/help/@g' www/js/about.js
-	$(SED) -i 's@/xtra/@/myvault/xtra/@g' www/help/index.html www/js/about.js
+	$(SED) -i 's@/xtra/@/myvault/xtra/@g' www/help/index.html www/js/about.js www/xtra/cryptor.html www/xtra/cryptor.js
 	$(TAR) -J -c -f webapp.tar --transform 's/^www/myvault/' www
 	$(SED) -i 's@/myvault/js/@/js/@g'  www/index.html $$(ls -1 www/js/*js) www/xtra/cryptor.html www/xtra/cryptor.js
 	$(SED) -i 's@/myvault/icons/@/icons/@g' www/index.html $$(ls -1 www/js/*js)
 	$(SED) -i 's@/myvault/help/@/help/@g' www/js/about.js
-	$(SED) -i 's@/myvault/xtra/@/xtra/@g' www/help/index.html www/js/about.js
+	$(SED) -i 's@/myvault/xtra/@/xtra/@g' www/help/index.html www/js/about.js www/xtra/cryptor.html www/xtra/cryptor.js
 	ls -lh webapp.tar
 
 
