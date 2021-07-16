@@ -2,7 +2,7 @@
  * Password support.
  * @module password
  */
-import { xmake, makeInputXWrapper } from '/js/utils.js'
+import { xmake, makeInputXWrapper, statusMsg } from '/js/utils.js'
 import { makeIcon, changeIcon } from '/js/icons.js'
 import { words } from '/js/en_words.js'
 import { common } from '/js/common.js'
@@ -369,6 +369,7 @@ function copyPassword(event) {
     updatePasswordLength(event)
     navigator.clipboard.writeText(text).then((text) => {}, () => {
         alert('internal error: clipboard copy operation failed')})
+    statusMsg(`copied ${text.length} bytes to the clipboard`)
 }
 
 /**
