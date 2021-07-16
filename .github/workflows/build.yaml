@@ -1,7 +1,8 @@
 # Build and test myvault using python, pytest, rust, wasm-pack,
 # clippy, jshint, jddocs, headless chrome browser and other stuff.
 #
-# It was tested locally using act: https://github.com/nektos/act
+# It was tested locally using act: https://github.com/nektos/act.
+# To get it to work i had to manually comment out the artifact upload.
 name: build-and-test
 
 on:
@@ -25,7 +26,7 @@ jobs:
 
       - run: sudo apt update
 
-      - run: sudo apt install -y zip unzip curl wget gdebi-core curl wget gdebi-core
+      - run: sudo apt install -y zip unzip curl wget gdebi-core curl wget gdebi-core git
 
       - name: 'Setup Python 3.9'
         uses: actions/setup-python@v2
@@ -82,9 +83,19 @@ jobs:
       # make the webapp.tar artifact: webapp.tar.
       - run: make webapp
 
+      # upload the artifact to the github action artifact location.
+      # to download the artifact from the command line
+      # 1. list all artifacts"
+      #    curl -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/jlinoff/myvault/actions/artifacts
+      # 2. choose the one that you want (for this example '75537995'
+      # 3. download the artifact (note that you need valid access credentials):
+      #    curl -u jlinoff -L https://api.github.com/repos/jlinoff/myvault/actions/artifacts/75537995/zip -o artifact.zip
+      # 4. view the contents:
+      #    unzip -l artifact.zip
       - name: 'upload webapp'
         uses: actions/upload-artifact@v2
         with:
           name: webapp
           path: webapp.tar
-          # Maximum is 90 days for public repos          retention-days: 30
+          retention-days: 30
+          # Maximum is 90 days for public repos
