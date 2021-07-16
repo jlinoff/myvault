@@ -609,16 +609,19 @@ You must have a number of dev tools installed. They are shown in the table below
 | Tool | Aliases | Note |
 | ---- | ----- | ---- |
 | apsell | _none_ | ASCII spell checker |
-| column | _none_ | columnizer tool |
+| cargo | _none_ | rust package manager and crate host |
+| column | _none_ | comman line text columnizer tool |
+| clippy | _none_ | rust lint tool |
 | grep |  _none_ | must support _-E_ |
 | jsdoc | _none_ | javascript source code documentation generator |
-| jshint| _none_ | relativtly unopinionated javascript linter |
+| jshint| _none_ | relatively unopinionated javascript linter |
 | make | gmake | GNU make|
 | pipenv | _none_ | python environment wrapper |
-| pytho3n | _none_ | python 3.9 |
-| rust |  _none_ | The rust compiler |
+| python3 | _none_ | python 3.9 |
+| rustc |  _none_ | rust compiler |
 | sed  | gsed  | GNU sed |
 | sort | gsort | GNU sort |
+| wasm-pack | _none_ | rust webassembly build tool |
 
 > The build system recognize both the tool and alternate names.
 

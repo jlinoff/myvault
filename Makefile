@@ -83,7 +83,7 @@ www/help/index.html: README.md VERSION www/help/index.css
 	grep -v '^# myVault' tmp.md > tmp1.md
 	grep -v '\[\!\[Releases\](' tmp1.md > tmp.md
 	pandoc -s --css index.css -s --metadata title='Help: myVault' --html-q-tags -o $@ tmp.md
-	rm -f tmp.md
+	rm -f tmp*.md
 
 # version
 # Generate the dynamic build/version information
