@@ -1,5 +1,6 @@
 # Build and test myvault using python, pytest, rust, wasm-pack,
-# clippy, jshint, jddocs, headless chrome browser and other stuff.
+# clippy, jshint, jddocs, headless chrome browser, pandoc, artifact uploads
+# and other stuff.
 #
 # It was tested locally using act: https://github.com/nektos/act.
 # To get it to work i had to manually comment out the artifact upload.
