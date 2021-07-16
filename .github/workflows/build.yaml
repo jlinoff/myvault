@@ -76,7 +76,7 @@ jobs:
 
       - run: sudo apt install -y pandoc
 
-      - run:  make build
+      - run: make build
 
       - run: make test
 
