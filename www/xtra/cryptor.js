@@ -56,19 +56,21 @@ function main() {
 </table>
 `)
     document.getElementById('x-text')
-        .xAddEventListener('input', e => updateTextSize(e))
-        .xAddEventListener('paste', e => updateTextSize(e))
-        .xAddEventListener('click', e => updateTextSize(e))
-        .xAddEventListener('change', e => updateTextSize(e))
+        .xAddEventListener('input', () => updateTextSize())
+        .xAddEventListener('paste', () => updateTextSize())
+        .xAddEventListener('click', () => updateTextSize())
+        .xAddEventListener('change', () => updateTextSize())
     document.getElementById('x-password')
-        .xAddEventListener('input', e => updatePasswordSize(e))
-        .xAddEventListener('paste', e => updatePasswordSize(e))
-        .xAddEventListener('click', e => updatePasswordSize(e))
-        .xAddEventListener('change', e => updatePasswordSize(e))
+        .xAddEventListener('input', () => updatePasswordSize())
+        .xAddEventListener('paste', () => updatePasswordSize())
+        .xAddEventListener('click', () => updatePasswordSize())
+        .xAddEventListener('change', () => updatePasswordSize())
     document.getElementById('x-filename-clear')
-        .xAddEventListener('click', () => {document.getElementById('x-filename').value = ''})
+        .xAddEventListener('click', () => {document.getElementById('x-filename').value = ''
+                                           updateTextSize()})
     document.getElementById('x-password-clear')
-        .xAddEventListener('click', () => {document.getElementById('x-password').value = ''})
+        .xAddEventListener('click', () => {document.getElementById('x-password').value = ''
+                                           updatePasswordSize()})
     document.getElementById('x-password-show-hide')
         .xAddEventListener('click', () => togglePasswordShowHide())
     document.getElementById('x-password-cryptic')
@@ -89,7 +91,7 @@ function main() {
         .xTooltip('generate a memorable password')
 }
 
-function updateTextSize(e) {
+function updateTextSize() {
     let value = document.getElementById('x-text').value
     document.getElementById('x-text-size').innerHTML = value.length
 }

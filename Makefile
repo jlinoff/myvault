@@ -32,7 +32,7 @@ crypt/crypt/pkg/rel/crypt.js:
 	cd crypt && $(MAKE)
 
 # lint
-# js and python
+# js and python, rust is linted by clippy during the crypt build
 ,PHONY: lint
 lint: lint-py lint-js  ## lint source code
 
