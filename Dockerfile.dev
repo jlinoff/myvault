@@ -1,0 +1,63 @@
+# TODO:
+# 1. add dev makefile target
+# 2. document the use of https://github.com/nektos/act in README
+# Creeate the image:
+#   docker build -t myvault/dev:latest -f keep/Dockerfile.dev .
+# Create the container
+# docker run -it --rm --init --name myvault/dev -h myvault/dev -p 8000:8000 -v $(pwd) myvault/dev:latest bash
+FROM ubuntu:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Los_Angeles
+ENV HOME=/root
+
+RUN apt update && \
+    apt install -y zip unzip curl wget gdebi-core git && \
+    apt install -y software-properties-common && \
+    apt install -y tzdata && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt install -y python3.9 && \
+    apt install -y python3.9-distutils && \
+    apt install -y pipenv && \
+    apt install -y nodejs npm && \
+    apt update && \
+    apt install -y nodejs && \
+    npm install -g jshint && \
+    npm install -g jsdoc && \
+    apt install -y pandoc && \
+    apt update
+
+# Rust
+# https://www.rust-lang.org/tools/install
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    . $HOME/.cargo/env && \
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash -s -- --mode no-prompt && \
+    wasm-pack --version && \
+    cargo --version && \
+    rustup --version
+
+# install google-chrome headless
+RUN if [ -f google-chrome-stable_current_amd64.deb ] ; then \
+    apt install -y libgbm1 libnspr4 libnspr4 fonts-liberation libnss3 libu2f-udev libwayland-server0 udev && \
+    apt install -y libappindicator1 fonts-liberation && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt install ./google-chrome-stable_current_amd64.deb && \
+    google-chrome --version 77 ; \
+fi
+
+WORKDIR /mnt
+RUN git clone https://github.com/jlinoff/myvault.git && \
+    python3.9 --version && \
+    pipenv --rm || true && \
+    pipenv install --deploy
+
+WORKDIR /mnt/myvault
+RUN . $HOME/.cargo/env && \
+    make clean && \
+    make build && \
+    make test
+
+RUN echo '. $HOME/.cargo/env' >> $HOME/.bashrc && \
+    echo '. $HOME/.cargo/env' >> $HOME/.profile
+
