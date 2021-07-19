@@ -173,6 +173,16 @@ testi: Pipfile.lock  ## run the local unit tests in interactive mode
 	$(call hdr,"$@")
 	PORT=8007 pipenv run python -m pytest tests/test_ui.py
 
+.PHONY: docker-image
+docker-image: ## Build the docker myvault/dev image
+	$(call hdr,"$@")
+	docker build -t myvault/dev:latest -f Dockerfile.dev .
+
+.PHONY: dev
+dev:  docker-image ## Run the docker myvault/dev image for development
+	$(call hdr,"$@")
+	docker run -it --rm --init --name myvault/dev -h myvault/dev -p 8000:8000 -v $(pwd) myvault/dev:latest bash
+
 # Help.
 .PHONY: help
 help:  ## This help message.
