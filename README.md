@@ -73,6 +73,7 @@ The meta data in the table is populated during the build process when the on-lin
     - [How to search for a record](#how-to-search-for-a-record)
     - [How to get help](#how-to-get-help)
     - [How to install and run locally without internet access](#how-to-install-and-run-locally-without-internet-access)
+    - [How to develop using the myvault-dev docker container](#How-to-develop-using-the-myvault-dev-docker-container)
     - [How to release the webapp](#how-to-release-the-webapp)
     - [How to share a records file](#how-to-share-a-records-file)
     - [How to change the master password](#how-to-change-the-master-password)
@@ -588,7 +589,6 @@ To delete a record, first view the record and then click on the trashcan icon.
 On the records page the search bar allows you to search for a record. Simply type in
 any words that are in the title and it will find records that match as you type.
 
-
 ## How to get help
 To get help,
 navigate to [https://jlinoff.github.io/myvault/](https://jlinoff.github.io/myvault/),
@@ -612,6 +612,7 @@ You must have a number of dev tools installed. They are shown in the table below
 | cargo | _none_ | rust package manager and crate host |
 | column | _none_ | comman line text columnizer tool |
 | clippy | _none_ | rust lint tool |
+| git |  _none_ | source code version control system |
 | grep |  _none_ | must support _-E_ |
 | jsdoc | _none_ | javascript source code documentation generator |
 | jshint| _none_ | relatively unopinionated javascript linter |
@@ -624,6 +625,8 @@ You must have a number of dev tools installed. They are shown in the table below
 | wasm-pack | _none_ | rust webassembly build tool |
 
 > The build system recognize both the tool and alternate names.
+
+> Note that only make and docker are needed if you use the docker container described in the next section.
 
 The aliases are for systems like Mac OS that use ancient versions of
 standard tools. It allows _make_ to recognize the more modern versions
@@ -642,16 +645,57 @@ Once that is done here are the steps to set it up.
 
 If you want a port other than 8000 (say 9000), run `make server PORT=9000`.
 
+## How to develop using the myvault-dev docker container
+_myVault_ can define a docker container that you can use for local
+development. It allows you to build, test and serve the system without
+installing any software other than docker and gnu make.
+
+You must have a small number of dev tools installed for this
+approach. They are shown in the table below.
+
+| Tool | Aliases | Note |
+| ---- | ----- | ---- |
+| docker | _none_ | system for managing containerized apps  |
+| git |  _none_ | source code version control system |
+| make | gmake | GNU make|
+
+The steps for setting up and using the container are:
+
+1. Get the project.
+   1. `git clone https://github.com/jlinoff/myvault`
+   2. `cd myvault`
+2. Create the container, build the project and log in.
+   1. `make dev`
+3. Once logged into the container  you can run any of the `make` or `git` commands as well as tools like `aspell`. A typical command sequence might look something like this.
+    1. `git checkout -b new-branch`
+    2. `make`
+    3. `git status`
+    4. `make server`
+
+> Note if you want to re-install the pipenv environment in the
+> container (perhaps after a `make clean`) you must run
+> `pipenv install -d --python=python3.9` to ensure that the
+> correct version of python is found.
+
+On the host you can watch the build status by:
+
+1. Running `docker ps` to get the container id.
+2. Then running something like: `docker exec it 789173edc736 htop`. Where `789173edc736` is the container id.
+
+To run the web server from the container run `make server` in the container
+and then browse to http://localhost:8007 on the host.
+
 ## How to release the webapp
 _myVault_ is released by running "`make webapp`" after building and testing changed.
 That target creates the "`webapp.tar`" archive which can be extracted to create a
-`myvault` directory tree. Here at the steps.
+`myvault` directory tree that can be installed on a web server. This is how the
+project is bundled for release to http:jlinoff.github.io/myvault. Here are the steps.
 
 1. Get the project.
    1. `git clone https://github.com/jlinoff/myvault`
    2. `cd myvault`
 2. Make changes.
-3. Build and test it locally. This is required to build the Rust components, the version data and to generate the documentation.
+    3. Build and test it locally. This is required to build the Rust components, the version data and to generate the documentation.
    1. `make` (try `make help` for info about all available targets).
 4. Create the release archive.
    1. `make webapp`

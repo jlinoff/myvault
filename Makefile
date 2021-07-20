@@ -9,12 +9,12 @@ VERSION_SRCS := www/index.html $(shell ls www/js/*js | grep -v version)
 include util.mk
 
 .PHONY: all
-all:  lint build test  ## build and test the package (default)
+all:  lint build test  ## Build, lint and test the project (default).
 
 # Build the Rust encryption module as WASM and the version info.
 .PHONY: build b
 b \
-build: www/js/crypt.js www/js/crypt_bg.wasm Pipfile.lock version src-docs jsdoc  ## build the project (alias b)
+build: www/js/crypt.js www/js/crypt_bg.wasm Pipfile.lock version src-docs jsdoc  ## Build the project (alias b).
 
 www/js/crypt.js: crypt/crypt/pkg/rel/crypt.js
 	$(call hdr,"copying rust generated file: $@")
@@ -34,15 +34,15 @@ crypt/crypt/pkg/rel/crypt.js:
 # lint
 # js and python, rust is linted by clippy during the crypt build
 ,PHONY: lint
-lint: lint-py lint-js  ## lint source code
+lint: lint-py lint-js  ## Lint python and javascript source code. The Rust source code is lined in the crypt build using clippy.
 
 .PHONY: lint-py
-lint-py:  Pipfile.lock  ## lint python source code
+lint-py:  Pipfile.lock  ## Lint python source code using pylint.
 	$(call hdr,"$@")
 	pipenv run pylint tests/test_ui.py
 
 Pipfile.lock: Pipfile
-	$(call hdr,"install pipenv")
+	$(call hdr,"update pipenv")
 	pipenv update
 
 .PHONY: lint-js
@@ -50,7 +50,7 @@ Pipfile.lock: Pipfile
 # jshint:
 #   $ sudo npm update -g
 #   $ sudo npm install -g jshint
-lint-js:  ## lint javascript source code using jshint
+lint-js:  ## Lint javascript source code using jshint.
 	$(call hdr,"$@")
 	jshint --version
 	jshint --config jshint.json $$(ls -1 www/js/*js | grep -v crypt.js)
@@ -58,13 +58,13 @@ lint-js:  ## lint javascript source code using jshint
 
 # help
 .PHONY: src-docs
-src-docs: www/help/index.html  ## generate the on-line help documentation for the source code using pandoc.
+src-docs: www/help/index.html  ## Generate the on-line help documentation for the source code using pandoc.
 
 # jsdoc:
 #   $ sudo npm update -g
 #   $ sudo npm install -g jsdoc
 .PHONY: jsdoc
-jsdoc:  www/xtra/doc/index.html  ## generate the internal source code documentation using jsdoc
+jsdoc:  www/xtra/doc/index.html  ## Generate the internal source code documentation using jsdoc.
 
 www/xtra/doc/index.html: README.md $(VERSION_SRCS)
 	$(call hdr,"jsdoc")
@@ -89,7 +89,7 @@ www/help/index.html: README.md VERSION www/help/index.css
 # version
 # Generate the dynamic build/version information
 .PHONY: version
-version: www/js/version.js ## generate the www/js/version.js data from VERSION and other sources
+version: www/js/version.js ## Generate the www/js/version.js data from VERSION and other sources.
 
 www/js/version.js: VERSION $(VERSION_SRCS) README.md
 	$(call hdr,"$@")
@@ -112,7 +112,7 @@ spell-check:  ## Spell check the README.md file using aspell.
 
 # clean -don't touch the local keep directory
 .PHONY: clean
-clean:  ## clean up
+clean:  ## Clean up.
 	$(call hdr,"$@")
 	find . -type f -name '*~' -delete
 	rm -f *.tar
@@ -121,7 +121,7 @@ clean:  ## clean up
 # Backup - the (git) source - redundant once in github
 .PHONY: backup bu
 bu \
-backup: myvault-git.tar  ## backup the source code (alias bu) - redundant once in github
+backup: myvault-git.tar  ## Backup the source code (alias bu) to myvault-git.tar, this is redundantnow that the project is in github.
 
 BGFILE ?= myvault-git.tar
 $(BGFILE): .git/index
@@ -133,7 +133,7 @@ $(BGFILE): .git/index
 # Create the web application
 .PHONY: webapp
 w \
-webapp:   ## create the web release tar file for upload to a site (myvault/).
+webapp:   ## Create the web release tar file for upload to a site (myvault/).
 	$(call hdr,"$@")
 	$(SED) -i 's@/js/@/myvault/js/@g' www/index.html $$(ls -1 www/js/*js) www/xtra/cryptor.html www/xtra/cryptor.js
 	$(SED) -i 's@/icons/@/myvault/icons/@g' www/index.html $$(ls -1 www/js/*js)
@@ -151,7 +151,7 @@ webapp:   ## create the web release tar file for upload to a site (myvault/).
 # using either a rust server or a python server.
 HTTP_SERVER ?= python
 PORT ?= 8000
-.PHONY: server
+PHONY: server
 server: ## Run a simple local server for debugging. To change the port: make server PORT=8000.
 	$(call hdr,"$@")
 ifeq ($(strip $(HTTP_SERVER)),rust)
@@ -163,15 +163,42 @@ else
 endif
 
 .PHONY: test
-test: Pipfile.lock ## run the local unit tests in headless mode
+test: Pipfile.lock ## Run the local unit tests in headless mode.
 	$(call hdr,"$@")
 	PORT=8007 pipenv run python -m pytest tests/test_ui.py --options="headless, incognito, no-sandbox, --disable-gpu"
 
 .PHONY: testi ti
 ti \
-testi: Pipfile.lock  ## run the local unit tests in interactive mode
+testi: Pipfile.lock  ## Run the local unit tests in interactive mode.
 	$(call hdr,"$@")
 	PORT=8007 pipenv run python -m pytest tests/test_ui.py
+
+# PROJECT_DIR is the name of the directory in the container.
+PROJECT_DIR ?= myvault-dev
+.PHONY: docker-image
+di \
+docker-image: ## Create the docker myvault/dev image for development, this takes awhile.
+	$(call hdr,"$@")
+	docker build \
+		--build-arg PROJECT_DIR=$(PROJECT_DIR) \
+		--progress plain \
+		-t myvault/dev:latest \
+		-f Dockerfile.dev \
+		.
+
+CPORT     ?= 8007
+.PHONY: dev
+d \
+dev: docker-image  ## Create the docker container (using the docker-image target) that is used for development and then login.
+	$(call hdr,"$@")
+	docker run -it --rm --init \
+		--name myvault-dev \
+		-h myvault-dev \
+		-p $(CPORT):8000 \
+		-w "/$(PROJECT_DIR)" \
+		-v $(PWD):/$(PROJECT_DIR) \
+		myvault/dev:latest \
+		bash
 
 # Help.
 .PHONY: help

@@ -1,0 +1,71 @@
+# Create a container that allows you to work on the myvault project
+# without having to install software locally. It depends on the caller
+# cloning out the project and typing "make dev".
+# Manually create the image:
+#   docker build -t myvault/dev:latest -f keep/Dockerfile.dev .
+# Manually create the container
+#   docker run -it --rm --init --name myvault/dev -h myvault/dev -p 8000:8000 -v $(pwd) myvault/dev:latest bash
+FROM ubuntu:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG PROJECT_DIR=myvault
+ENV TZ=America/Los_Angeles
+ENV HOME=/root
+
+RUN set -x && \
+    apt-get update && \
+    apt-get install -y apt-utils && \
+    apt-get install -y zip unzip curl wget gdebi-core git && \
+    apt-get install -y software-properties-common && \
+    apt-get install -y tzdata && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get install -y python3.9 && \
+    apt-get install -y python3.9-distutils && \
+    apt-get install -y pipenv && \
+    apt-get install -y nodejs npm && \
+    apt-get update && \
+    apt-get install -y nodejs && \
+    npm install -g jshint && \
+    npm install -g jsdoc && \
+    apt-get install -y pandoc && \
+    apt-get install -y aspell && \
+    apt-get install -y htop tree ripgrep && \
+    apt-get update
+
+# Rust
+# https://www.rust-lang.org/tools/install
+RUN set -x && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    . $HOME/.cargo/env && \
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash -s -- --mode no-prompt && \
+    wasm-pack --version && \
+    cargo --version && \
+    rustup --version
+
+# install google-chrome headless
+RUN if [ ! -f google-chrome-stable_current_amd64.deb ] ; then \
+    set -x && \
+    apt-get install -y libgbm1 libnspr4 libnspr4 fonts-liberation libnss3 libu2f-udev libwayland-server0 udev && \
+    apt-get install -y libappindicator1 fonts-liberation && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    google-chrome --version ; \
+fi
+
+# /mnt maps to the cloned out directory
+# git clone https://github.com/jlinoff/myvault.git
+# cd myvault
+# make dev
+RUN echo '. $HOME/.cargo/env' >> $HOME/.bashrc && \
+    echo '. $HOME/.cargo/env' >> $HOME/.profile
+
+WORKDIR /$PROJECT_DIR
+RUN set -x && \
+    make clean && \
+    python3.9 --version && \
+    pipenv --rm || true && \
+    pipenv install --python=python3.9 -d
+
+# Containers can now run steps like:
+# make, make clean, make build, make test, etc.
