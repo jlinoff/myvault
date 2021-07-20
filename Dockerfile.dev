@@ -1,14 +1,14 @@
 # Create a container that allows you to work on the myvault project
-# without having to install softwatre locally. It clones out the
-# project in myvault-dev so that it can be used anywhere.
-# Creeate the image:
+# without having to install software locally. It depends on the caller
+# cloning out the project and typing "make dev".
+# Manually create the image:
 #   docker build -t myvault/dev:latest -f keep/Dockerfile.dev .
-# Create the container
-# docker run -it --rm --init --name myvault/dev -h myvault/dev -p 8000:8000 -v $(pwd) myvault/dev:latest bash
+# Manually create the container
+#   docker run -it --rm --init --name myvault/dev -h myvault/dev -p 8000:8000 -v $(pwd) myvault/dev:latest bash
 FROM ubuntu:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG CLONE_DIR=myvault-dev
+ARG PROJECT_DIR=myvault
 ENV TZ=America/Los_Angeles
 ENV HOME=/root
 
@@ -29,6 +29,7 @@ RUN set -x && \
     npm install -g jsdoc && \
     apt-get install -y pandoc && \
     apt-get install -y aspell && \
+    apt-get install -y htop tree ripgrep && \
     apt-get update
 
 # Rust
@@ -56,23 +57,15 @@ fi
 # git clone https://github.com/jlinoff/myvault.git
 # cd myvault
 # make dev
-RUN git clone https://github.com/jlinoff/myvault.git /mnt/$CLONE_DIR
-
 RUN echo '. $HOME/.cargo/env' >> $HOME/.bashrc && \
     echo '. $HOME/.cargo/env' >> $HOME/.profile
 
-WORKDIR /mnt/$CLONE_DIR
+WORKDIR /$PROJECT_DIR
 RUN set -x && \
+    make clean && \
     python3.9 --version && \
     pipenv --rm || true && \
-    pipenv install --deploy
+    pipenv install --python=python3.9 -d
 
-
-RUN . $HOME/.cargo/env && \
-    make clean && \
-    make build && \
-    ls -ltr
-
-RUN . $HOME/.cargo/env && \
-    make test
-
+# Containers can now run steps like:
+# make, make clean, make build, make test, etc.

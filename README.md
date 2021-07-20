@@ -612,6 +612,7 @@ You must have a number of dev tools installed. They are shown in the table below
 | cargo | _none_ | rust package manager and crate host |
 | column | _none_ | comman line text columnizer tool |
 | clippy | _none_ | rust lint tool |
+| git |  _none_ | source code version control system |
 | grep |  _none_ | must support _-E_ |
 | jsdoc | _none_ | javascript source code documentation generator |
 | jshint| _none_ | relatively unopinionated javascript linter |
@@ -655,30 +656,46 @@ approach. They are shown in the table below.
 | Tool | Aliases | Note |
 | ---- | ----- | ---- |
 | docker | _none_ | system for managing containerized apps  |
+| git |  _none_ | source code version control system |
 | make | gmake | GNU make|
 
-The steps for setting up the container are:
+The steps for setting up and using the container are:
 
 1. Get the project.
    1. `git clone https://github.com/jlinoff/myvault`
    2. `cd myvault`
 2. Create the container, build the project and log in.
    1. `make dev`
-3. Once logged in you can run any of the `make` or `git` commands.
-   
-For example, to run the local server: simply run `make server` in the container.
-You can then access it from http://localhost:8007.
-   
+3. Once logged into the container  you can run any of the `make` or `git` commands as well as tools like `aspell`. A typical command sequence might look something like this.
+    1. `git checkout -b new-branch`
+    2. `make`
+    3. `git status`
+    4. `make server`
+
+> Note if you want to re-install the pipenv environment in the
+> container (perhaps after a `make clean`) you must run
+> `pipenv install -d --python=python3.9` to ensure that the
+> correct version of python is found.
+
+On the host you can watch the build status by:
+
+1. Running `docker ps` to get the container id.
+2. Then running something like: `docker exec it 789173edc736 htop`. Where `789173edc736` is the container id.
+
+To run the web server from the container run `make server` in the container
+and then browse to http://localhost:8007 on the host.
+
 ## How to release the webapp
 _myVault_ is released by running "`make webapp`" after building and testing changed.
 That target creates the "`webapp.tar`" archive which can be extracted to create a
-`myvault` directory tree. Here at the steps.
+`myvault` directory tree that can be installed on a web server. This is how the
+project is bundled for release to http:jlinoff.github.io/myvault. Here are the steps.
 
 1. Get the project.
    1. `git clone https://github.com/jlinoff/myvault`
    2. `cd myvault`
 2. Make changes.
-3. Build and test it locally. This is required to build the Rust components, the version data and to generate the documentation.
+    3. Build and test it locally. This is required to build the Rust components, the version data and to generate the documentation.
    1. `make` (try `make help` for info about all available targets).
 4. Create the release archive.
    1. `make webapp`
