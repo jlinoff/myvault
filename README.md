@@ -689,7 +689,7 @@ and then browse to http://localhost:8007 on the host.
 
 ## How to test github actions locally
 I used https://github.com/nektos/act to test `.github/workflows/build.yaml` locally. It is a great
-tool and strongly recommend it. 
+tool and strongly recommend it.
 
 > Note that you must have `golang` installed.
 
