@@ -88,7 +88,7 @@ jobs:
       # to download the artifact from the command line
       # 1. list all artifacts"
       #    curl -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/jlinoff/myvault/actions/artifacts
-      # 2. choose the one that you want (for this example '75537995'
+      # 2. choose the one that you want (for this example '75537995')
       # 3. download the artifact (note that you need valid access credentials):
       #    curl -u jlinoff -L https://api.github.com/repos/jlinoff/myvault/actions/artifacts/75537995/zip -o artifact.zip
       # 4. view the contents:

@@ -74,6 +74,8 @@ The meta data in the table is populated during the build process when the on-lin
     - [How to get help](#how-to-get-help)
     - [How to install and run locally without internet access](#how-to-install-and-run-locally-without-internet-access)
     - [How to develop using the myvault-dev docker container](#How-to-develop-using-the-myvault-dev-docker-container)
+    - [How to test github actions locally](#how-to-test-github-actions-locally)
+    - [How to download the github workflow artifact](#how-to-download-the-github-workflow-artifact)
     - [How to release the webapp](#how-to-release-the-webapp)
     - [How to share a records file](#how-to-share-a-records-file)
     - [How to change the master password](#how-to-change-the-master-password)
@@ -684,6 +686,33 @@ On the host you can watch the build status by:
 
 To run the web server from the container run `make server` in the container
 and then browse to http://localhost:8007 on the host.
+
+## How to test github actions locally
+I used https://github.com/nektos/act to test `.github/workflows/build.yaml` locally. It is a great
+tool and strongly recommend it. 
+
+> Note that you must have `golang` installed.
+
+Here is how you install it.
+
+```bash
+GOBIN="/home/jlinoff/bin" go install github.com/nektos/act@master
+```
+
+Once it is installed, simply run the `act` command in the _myVault_ project directory.
+
+> Note that I had to comment out the `uppload webapp` step in `build.yaml` because
+> upload is not yet supported.
+
+## How to download the github workflow artifact
+When the github actions are run a webapp workflow artifact is created. Here is how to download it.
+
+1. List all artifacts.
+   1. `curl -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/jlinoff/myvault/actions/artifacts`
+2. Choose the one that you want (for this example `75537995`).
+3. Download it (required valid access credentials).
+   1. `curl -u jlinoff -L https://api.github.com/repos/jlinoff/myvault/actions/artifacts/75537995/zip -o artifact.zip`
+
 
 ## How to release the webapp
 _myVault_ is released by running "`make webapp`" after building and testing changed.
