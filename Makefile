@@ -189,7 +189,7 @@ docker-image: ## Create the docker myvault/dev image for development, this takes
 CPORT     ?= 8007
 .PHONY: dev
 d \
-dev: docker-image  ## Create the docker container used for development and login.
+dev: docker-image  ## Create the docker container (using the docker-image target) that is used for development and then login.
 	$(call hdr,"$@")
 	docker run -it --rm --init \
 		--name myvault-dev \
