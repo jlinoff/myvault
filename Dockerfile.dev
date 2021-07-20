@@ -1,6 +1,6 @@
-# TODO:
-# 1. add dev makefile target
-# 2. document the use of https://github.com/nektos/act in README
+# Create a container that allows you to work on the myvault project
+# without having to install softwatre locally. It clones out the
+# project in myvault-dev so that it can be used anywhere.
 # Creeate the image:
 #   docker build -t myvault/dev:latest -f keep/Dockerfile.dev .
 # Create the container
@@ -8,28 +8,33 @@
 FROM ubuntu:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG CLONE_DIR=myvault-dev
 ENV TZ=America/Los_Angeles
 ENV HOME=/root
 
-RUN apt update && \
-    apt install -y zip unzip curl wget gdebi-core git && \
-    apt install -y software-properties-common && \
-    apt install -y tzdata && \
+RUN set -x && \
+    apt-get update && \
+    apt-get install -y apt-utils && \
+    apt-get install -y zip unzip curl wget gdebi-core git && \
+    apt-get install -y software-properties-common && \
+    apt-get install -y tzdata && \
     add-apt-repository ppa:deadsnakes/ppa -y && \
-    apt install -y python3.9 && \
-    apt install -y python3.9-distutils && \
-    apt install -y pipenv && \
-    apt install -y nodejs npm && \
-    apt update && \
-    apt install -y nodejs && \
+    apt-get install -y python3.9 && \
+    apt-get install -y python3.9-distutils && \
+    apt-get install -y pipenv && \
+    apt-get install -y nodejs npm && \
+    apt-get update && \
+    apt-get install -y nodejs && \
     npm install -g jshint && \
     npm install -g jsdoc && \
-    apt install -y pandoc && \
-    apt update
+    apt-get install -y pandoc && \
+    apt-get install -y aspell && \
+    apt-get update
 
 # Rust
 # https://www.rust-lang.org/tools/install
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+RUN set -x && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     . $HOME/.cargo/env && \
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash -s -- --mode no-prompt && \
     wasm-pack --version && \
@@ -37,27 +42,37 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     rustup --version
 
 # install google-chrome headless
-RUN if [ -f google-chrome-stable_current_amd64.deb ] ; then \
-    apt install -y libgbm1 libnspr4 libnspr4 fonts-liberation libnss3 libu2f-udev libwayland-server0 udev && \
-    apt install -y libappindicator1 fonts-liberation && \
+RUN if [ ! -f google-chrome-stable_current_amd64.deb ] ; then \
+    set -x && \
+    apt-get install -y libgbm1 libnspr4 libnspr4 fonts-liberation libnss3 libu2f-udev libwayland-server0 udev && \
+    apt-get install -y libappindicator1 fonts-liberation && \
     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt install ./google-chrome-stable_current_amd64.deb && \
-    google-chrome --version 77 ; \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    google-chrome --version ; \
 fi
 
-WORKDIR /mnt
-RUN git clone https://github.com/jlinoff/myvault.git && \
-    python3.9 --version && \
-    pipenv --rm || true && \
-    pipenv install --deploy
+# /mnt maps to the cloned out directory
+# git clone https://github.com/jlinoff/myvault.git
+# cd myvault
+# make dev
+RUN git clone https://github.com/jlinoff/myvault.git /mnt/$CLONE_DIR
 
 RUN echo '. $HOME/.cargo/env' >> $HOME/.bashrc && \
     echo '. $HOME/.cargo/env' >> $HOME/.profile
 
-WORKDIR /mnt/myvault
-RUN make clean && \
-    make build
+WORKDIR /mnt/$CLONE_DIR
+RUN set -x && \
+    python3.9 --version && \
+    pipenv --rm || true && \
+    pipenv install --deploy
 
-RUN make test
+
+RUN . $HOME/.cargo/env && \
+    make clean && \
+    make build && \
+    ls -ltr
+
+RUN . $HOME/.cargo/env && \
+    make test
 

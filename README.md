@@ -73,6 +73,7 @@ The meta data in the table is populated during the build process when the on-lin
     - [How to search for a record](#how-to-search-for-a-record)
     - [How to get help](#how-to-get-help)
     - [How to install and run locally without internet access](#how-to-install-and-run-locally-without-internet-access)
+    - [How to develop using the myvault-dev docker container](#How-to-develop-using-the-myvault-dev-docker-container)
     - [How to release the webapp](#how-to-release-the-webapp)
     - [How to share a records file](#how-to-share-a-records-file)
     - [How to change the master password](#how-to-change-the-master-password)
@@ -588,7 +589,6 @@ To delete a record, first view the record and then click on the trashcan icon.
 On the records page the search bar allows you to search for a record. Simply type in
 any words that are in the title and it will find records that match as you type.
 
-
 ## How to get help
 To get help,
 navigate to [https://jlinoff.github.io/myvault/](https://jlinoff.github.io/myvault/),
@@ -625,6 +625,8 @@ You must have a number of dev tools installed. They are shown in the table below
 
 > The build system recognize both the tool and alternate names.
 
+> Note that only make and docker are needed if you use the docker container described in the next section.
+
 The aliases are for systems like Mac OS that use ancient versions of
 standard tools. It allows _make_ to recognize the more modern versions
 that were installed with tools like _macports_.
@@ -642,6 +644,31 @@ Once that is done here are the steps to set it up.
 
 If you want a port other than 8000 (say 9000), run `make server PORT=9000`.
 
+## How to develop using the myvault-dev docker container
+_myVault_ can define a docker container that you can use for local
+development. It allows you to build, test and serve the system without
+installing any software other than docker and gnu make.
+
+You must have a small number of dev tools installed for this
+approach. They are shown in the table below.
+
+| Tool | Aliases | Note |
+| ---- | ----- | ---- |
+| docker | _none_ | system for managing containerized apps  |
+| make | gmake | GNU make|
+
+The steps for setting up the container are:
+
+1. Get the project.
+   1. `git clone https://github.com/jlinoff/myvault`
+   2. `cd myvault`
+2. Create the container, build the project and log in.
+   1. `make dev`
+3. Once logged in you can run any of the `make` or `git` commands.
+   
+For example, to run the local server: simply run `make server` in the container.
+You can then access it from http://localhost:8007.
+   
 ## How to release the webapp
 _myVault_ is released by running "`make webapp`" after building and testing changed.
 That target creates the "`webapp.tar`" archive which can be extracted to create a

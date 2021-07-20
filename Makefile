@@ -42,7 +42,7 @@ lint-py:  Pipfile.lock  ## lint python source code
 	pipenv run pylint tests/test_ui.py
 
 Pipfile.lock: Pipfile
-	$(call hdr,"install pipenv")
+	$(call hdr,"update pipenv")
 	pipenv update
 
 .PHONY: lint-js
@@ -151,7 +151,7 @@ webapp:   ## create the web release tar file for upload to a site (myvault/).
 # using either a rust server or a python server.
 HTTP_SERVER ?= python
 PORT ?= 8000
-.PHONY: server
+PHONY: server
 server: ## Run a simple local server for debugging. To change the port: make server PORT=8000.
 	$(call hdr,"$@")
 ifeq ($(strip $(HTTP_SERVER)),rust)
@@ -173,15 +173,32 @@ testi: Pipfile.lock  ## run the local unit tests in interactive mode
 	$(call hdr,"$@")
 	PORT=8007 pipenv run python -m pytest tests/test_ui.py
 
+CLONE_DIR ?= myvault-dev
 .PHONY: docker-image
-docker-image: ## Build the docker myvault/dev image
+di \
+docker-image: ## Create the docker myvault/dev image for development, this takes awhile
 	$(call hdr,"$@")
-	docker build -t myvault/dev:latest -f Dockerfile.dev .
+	[ ! -d $(CLONE_DIR) ] && mkdir -p $(CLONE_DIR) || true
+	docker build \
+		--build-arg CLONE_DIR=$(CLONE_DIR) \
+		--progress plain \
+		-t myvault/dev:latest \
+		-f Dockerfile.dev \
+		.
 
+CPORT     ?= 8007
 .PHONY: dev
-dev:  docker-image ## Run the docker myvault/dev image for development
+d \
+dev: docker-image  ## Create the docker container used for development and login.
 	$(call hdr,"$@")
-	docker run -it --rm --init --name myvault/dev -h myvault/dev -p 8000:8000 -v $(pwd) myvault/dev:latest bash
+	docker run -it --rm --init \
+		--name myvault-dev \
+		-h myvault-dev \
+		-p $(CPORT):8000 \
+		-v $(PWD):/mnt \
+		-v $(PWD)/$(CLONE_DIR):/mnt/$(CLONE_DIR) \
+		myvault/dev:latest \
+		bash
 
 # Help.
 .PHONY: help
