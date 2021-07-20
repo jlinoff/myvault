@@ -74,11 +74,8 @@ The meta data in the table is populated during the build process when the on-lin
     - [How to get help](#how-to-get-help)
     - [How to install and run locally without internet access](#how-to-install-and-run-locally-without-internet-access)
     - [How to develop using the myvault-dev docker container](#How-to-develop-using-the-myvault-dev-docker-container)
-<<<<<<< HEAD
     - [How to test github actions locally](#how-to-test-github-actions-locally)
     - [How to download the github workflow artifact](#how-to-download-the-github-workflow-artifact)
-=======
->>>>>>> cbc2a6a4058b6b44b4eb3f0d72467aacb40566b8
     - [How to release the webapp](#how-to-release-the-webapp)
     - [How to share a records file](#how-to-share-a-records-file)
     - [How to change the master password](#how-to-change-the-master-password)
@@ -690,7 +687,6 @@ On the host you can watch the build status by:
 To run the web server from the container run `make server` in the container
 and then browse to http://localhost:8007 on the host.
 
-<<<<<<< HEAD
 ## How to test github actions locally
 I used https://github.com/nektos/act to test `.github/workflows/build.yaml` locally. It is a great
 tool and strongly recommend it.
@@ -717,9 +713,6 @@ When the github actions are run a webapp workflow artifact is created. Here is h
 3. Download it (required valid access credentials).
    1. `curl -u jlinoff -L https://api.github.com/repos/jlinoff/myvault/actions/artifacts/75537995/zip -o artifact.zip`
 
-
-=======
->>>>>>> cbc2a6a4058b6b44b4eb3f0d72467aacb40566b8
 ## How to release the webapp
 _myVault_ is released by running "`make webapp`" after building and testing changed.
 That target creates the "`webapp.tar`" archive which can be extracted to create a
