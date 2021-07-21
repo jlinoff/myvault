@@ -404,8 +404,7 @@ function makeRecordViewEntry(ridx, idx, div, key, value) {
                     let rid = bid.replace('-button', '')
                     let img = button.getElementsByTagName('img')[0]
                     let pp = event.currentTarget.parentNode.parentNode
-                    let input = pp.getElementsByTagName('input')[0] // get the password input
-                    input = document.getElementById(rid)
+                    let input = document.getElementById(rid)
                     if (input.type === 'text') {
                         input.type = 'password'
                         changeIcon(img, common.icons.eyeBlocked)
