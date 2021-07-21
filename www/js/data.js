@@ -303,6 +303,7 @@ function getNumVisibleRecs() {
 // make record entry
 function makeRecordViewEntry(ridx, idx, div, key, value) {
     let pid = 'x-data-record-password-key-' + ridx + '-' + idx
+    let bid = pid + '-button'
     let ftype = getFieldValueType(key)
     if (ftype === 'string') {
         // check for the special case where the value is a URL
@@ -395,12 +396,15 @@ function makeRecordViewEntry(ridx, idx, div, key, value) {
                     color: common.themes._activeColors().fgColor,
                     marginLeft: '5px',
                 })
+                .xId(bid)
                 .xAddClass('x-theme-element')
                 .xAddEventListener('click', (event) => {
                     let button = event.currentTarget
+                    let bid = button.id
+                    let rid = bid.replace('-button', '')
                     let img = button.getElementsByTagName('img')[0]
                     let pp = event.currentTarget.parentNode.parentNode
-                    let input = pp.getElementsByTagName('input')[0] // get the password input
+                    let input = document.getElementById(rid)
                     if (input.type === 'text') {
                         input.type = 'password'
                         changeIcon(img, common.icons.eyeBlocked)
