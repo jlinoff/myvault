@@ -393,6 +393,11 @@ server reliability issues. If you are using a tool that relies on an external
 server and it goes down, the service will not be avaiable. That cannot
 happen with _myVault_ because it runs in your browser on your local host.
 
+If your database is stored on an external server and that server is
+down you are still subject to reliability issues _on that server_, but
+you can mitigate that vulnerability by storing the data locally and
+uploading it periodicallly.
+
 ### Over the Shoulder Surfing Attack
 Internally the data is stored in decrypted form, so you may be
 vulnerable to over the shoulder surfing attacks where someone or
