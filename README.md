@@ -390,7 +390,7 @@ over the internet does not guarantee that your data is secure_.
 ### Third Party Web Site Reliability
 As mentioned in the previous point, _myVault_ is not subject to third party
 server reliability issues. If you are using a tool that relies on an external
-server and it goes down, the service will not be avaiable. That cannot
+server and it goes down, the service will not be available. That cannot
 happen with _myVault_ because it runs in your browser on your local host.
 
 If your database is stored on an external server and that server is
