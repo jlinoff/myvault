@@ -10,5 +10,4 @@ www/README.pdf
 *.tar
 www/help/index.html
 www/xtra/doc/
-Pipfile.lock
 keep/
