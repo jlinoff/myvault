@@ -52,6 +52,7 @@ The meta data in the table is populated during the build process when the on-lin
     - [Security](#security)
       - [MITM](#mitm)
       - [Third Party Web Site Security](#third-party-web-site-security)
+      - [Third Party Web Site Reliability](#third-party-web-site-reliability)
       - [Over the Shoulder Surfing Attack](#over-the-shoulder-surfing-attack)
       - [Clipboard Attack](#clipboard-attack)
       - [Unattended Browser](#unattended-browser)
@@ -386,6 +387,12 @@ algorithms run quite fast and are not exposed in javascript.
 _However, running the algorithms internally and not exporting the data
 over the internet does not guarantee that your data is secure_.
 
+### Third Party Web Site Reliability
+As mentioned in the previous point, _myVault_ is not subject to third party
+server reliability issues. If you are using a tool that relies on an external
+server and it goes down, the service will not be avaiable. That cannot
+happen with _myVault_ because it runs in your browser on your local host.
+
 ### Over the Shoulder Surfing Attack
 Internally the data is stored in decrypted form, so you may be
 vulnerable to over the shoulder surfing attacks where someone or
@@ -430,7 +437,7 @@ security patches and use some sort of security tool to protect your
 system.
 
 ### Website Spoofing
-Finally, web site spoofing could be used to direct you to a website
+Finally, Web site spoofing could be used to direct you to a website
 that could be used to steal your information using a look alike
 webapp. To mitigate that make sure that you accessing the _myVault_ from
 a known, trusted site.
