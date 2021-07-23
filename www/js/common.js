@@ -283,6 +283,7 @@ export function restoreCommon() {
 export function resetCommon() {
     common.themes.props = getThemeProps()
     common.themes.colors = getThemeColors()
+    common.meta.title = TITLE
     saveCommon()
 }
 
