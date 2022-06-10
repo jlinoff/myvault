@@ -1,6 +1,8 @@
 # myVault
 [![Releases](https://img.shields.io/github/release/jlinoff/myvault?style)](https://github.com/jlinoff/myvault/releases)
 
+myvault has been replaced by [pam](https://github.com/jlinoff/pam).
+
 <details>
 
 <summary>About</summary>
